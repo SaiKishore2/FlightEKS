@@ -1,0 +1,9 @@
+{
+  "name": "transcribe-starter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-transcribe": "^3.400.0",
+    "@aws-sdk/client-sns": "^3.400.0"
+  }
+}

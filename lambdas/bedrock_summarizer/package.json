@@ -1,0 +1,10 @@
+{
+  "name": "bedrock-summarizer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.400.0",
+    "@aws-sdk/client-bedrock-runtime": "^0.0.18",
+    "node-fetch": "^2.6.7"
+  }
+}

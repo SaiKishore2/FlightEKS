@@ -1,0 +1,11 @@
+image:
+  repository: <ECR_REPO>/flight
+  tag: latest
+consumer:
+  replicas: 2
+  env:
+    KAFKA_BROKERS: "<MSK_BOOTSTRAP>"
+    ALERT_SNS_ARN: "<SNS_TOPIC_ARN>"
+    UPLOAD_BUCKET: "<S3_BUCKET>"
+webhook:
+  replicas: 1

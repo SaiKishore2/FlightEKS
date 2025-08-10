@@ -1,0 +1,49 @@
+name: CI CD Pipeline
+on: push:
+  branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Build & push images
+        run: |
+          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO_PREFIX }}-producer:latest ./services/producer
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO_PREFIX }}-producer:latest
+          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO_PREFIX }}-consumer:latest ./services/consumer
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO_PREFIX }}-consumer:latest
+          docker build -t ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO_PREFIX }}-webhook:latest ./services/webhook
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPO_PREFIX }}-webhook:latest
+
+  terraform:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v2
+      - name: Terraform init & apply
+        run: |
+          cd infra/terraform
+          terraform init -input=false
+          terraform apply -auto-approve
+
+  helm-deploy:
+    needs: terraform
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+      - name: Helm upgrade/install
+        run: |
+          helm upgrade --install flight-services ./k8s/helm-charts/flight-services --namespace default --create-namespace

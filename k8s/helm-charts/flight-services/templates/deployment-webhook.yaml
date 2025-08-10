@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: { name: webhook-worker }
+spec:
+  replicas: {{ .Values.webhook.replicas }}
+  selector: { matchLabels: { app: webhook-worker } }
+  template:
+    metadata: { labels: { app: webhook-worker } }
+    spec:
+      containers:
+        - name: webhook
+          image: "{{ .Values.image.repository }}/webhook:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 4000

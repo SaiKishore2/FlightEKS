@@ -1,0 +1,4 @@
+apiVersion: v2
+name: flight-services
+version: 0.1.0
+description: Helm chart for flight services (consumer + webhook)
