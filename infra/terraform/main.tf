@@ -14,8 +14,8 @@ module "eks" {
   version = "21.0.0"
   cluster_name = "${var.project}-eks"
   cluster_version = "1.28"
-  vpc_id = var.vpc_id
-  subnets = var.private_subnet_ids
+  vpc_id = "vpc-0d9e2086b0b55b012"
+  subnets = "subnet-0e13eb76512baaaf2"
   node_groups = {
     on_demand = {
       desired_capacity = 2
@@ -29,8 +29,8 @@ module "eks" {
 resource "aws_msk_serverless_cluster" "msk" {
   cluster_name = "${var.project}-msk-sls"
   vpc_config {
-    subnet_ids = var.private_subnet_ids
-    security_group_ids = [var.msk_security_group_id]
+    subnet_ids = "subnet-0e13eb76512baaaf2"
+    security_group_ids = ["sg-00776c97b0d425bfb"]
   }
 }
 
